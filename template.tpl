@@ -1,8 +1,8 @@
 ___INFO___
 
 {
-  "displayName": "Empathy Co Search Query Tag",
-  "description": "Fire this tag when a search is performed in your site populating variables collecting search info.",
+  "displayName": "Empathy.co search - query",
+  "description": "Fire this tag when a search is performed in your site populating variables collecting search data.",
   "securityGroups": [],
   "id": "cvt_temp_public_id",
   "type": "TAG",
@@ -37,11 +37,6 @@ ___TEMPLATE_PARAMETERS___
     "valueHint": "i.e. mycompanyname"
   },
   {
-    "displayName": "Input Parameters",
-    "name": "Input Parameters",
-    "type": "LABEL"
-  },
-  {
     "help": "Introduce search term of the current search",
     "alwaysInSummary": false,
     "valueValidators": [
@@ -57,7 +52,7 @@ ___TEMPLATE_PARAMETERS___
     "valueHint": "i.e. jeans, table, lipstick ..."
   },
   {
-    "help": "Introduce number of results obtained after the search is performed",
+    "help": "Introduce number of results obtained after the search is performed. Introduce 0 when no results",
     "alwaysInSummary": false,
     "valueValidators": [
       {
@@ -73,7 +68,7 @@ ___TEMPLATE_PARAMETERS___
     "simpleValueType": true,
     "name": "totalHits",
     "type": "TEXT",
-    "valueHint": "i.e. 124, 58, 0 ... Introduce 0 when no results."
+    "valueHint": "i.e. 124, 58, 0 ..."
   },
   {
     "help": "Introduce the number of SERP loaded.",
@@ -118,6 +113,10 @@ ___TEMPLATE_PARAMETERS___
             {
               "displayValue": "Section",
               "value": "section"
+            },
+            {
+              "value": "catalog",
+              "displayValue": "Catalog"
             }
           ],
           "displayName": "Filter Name",
@@ -233,27 +232,6 @@ ___WEB_PERMISSIONS___
   {
     "instance": {
       "key": {
-        "publicId": "logging",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "environments",
-          "value": {
-            "type": 1,
-            "string": "all"
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
-    },
-    "isRequired": true
-  },
-  {
-    "instance": {
-      "key": {
         "publicId": "send_pixel",
         "versionId": "1"
       },
@@ -302,7 +280,6 @@ ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
 // Enter your template code here.
 // Requirements:
-const log = require('logToConsole');
 const sendPixel = require('sendPixel');
 const getReferrer = require('getReferrerUrl');
 const query = require('queryPermission');
@@ -317,19 +294,16 @@ var i = 0;
 //1.Query
 if(typeof(data.query) !== "undefined" && data.query !== ""){
 	parameters[i] = 'q=' + data.query;
-	log(parameters[i]);
 	i++;
 }
 //2.Number of results (totalHits):
 if(typeof(data.totalHits) !== "undefined" && data.totalHits !== ""){
 	parameters[i] = 'totalHits=' + data.totalHits;
-log(parameters[i]);	
   i++;
 }
 //3.SERP Number of results (totalHits):
 if(typeof(data.page) !== "undefined" && data.page !== ""){
 	parameters[i] = 'page=' + data.page;
-  log(parameters[i]);
 	i++;
 }
 
@@ -338,7 +312,6 @@ if(typeof(data.filters) !== "undefined" && data.filters.length > 0){
   for (var j=0; j < data.filters.length ; j++){
   	if(typeof(data.filters[j]) !== "undefined" && data.filters[j] !== ""){
       	parameters[i] = data.filters[j].filters_name +'=' + data.filters[j].filters_value;
-      log(parameters[i]);
 		i++;
 		j++;
     }
@@ -355,7 +328,6 @@ if (query('get_referrer', 'path')) {
 }
 if(referrer !== ""){
 	parameters[i] = 'referrer=' + referrer;
-    log(parameters[i]);
 	i++;
 }
 
@@ -364,7 +336,6 @@ if(typeof(data.additionalParameters) !== "undefined" && data.additionalParameter
   for (var j=0; j < data.additionalParameters.length ; j++){
   	if(typeof(data.additionalParameters[j]) !== "undefined" && data.additionalParameters[j] !== ""){
       	parameters[i] = data.additionalParameters[j].additionalParameters_name +'=' + data.additionalParameters[j].additionalParameters_value;
-      log(parameters[i]);
 		i++;
 		j++;
     }
@@ -376,7 +347,6 @@ if(typeof(data.IDsParameters) !== "undefined" && data.IDsParameters.length > 0){
   for (var j=0; j < data.IDsParameters.length ; j++){
   	if(typeof(data.IDsParameters[j]) !== "undefined" && data.IDsParameters[j] !== ""){
       	parameters[i] = data.IDsParameters[j].IDsParameters_name +'=' + data.IDsParameters[j].IDsParameters_value;
-      log(parameters[i]);
 		i++;
 		j++;
     }
@@ -386,7 +356,6 @@ if(typeof(data.IDsParameters) !== "undefined" && data.IDsParameters.length > 0){
 //Send request:
 //Request built
 let request_url = base_url + data.instanceID + "/query?" +parameters.join('&');
-log(request_url);
 let url = request_url;
 //Set request permissions:
 if (query('send_pixel', base_url)) {
@@ -395,7 +364,6 @@ if (query('send_pixel', base_url)) {
 
 
 // Call data.gtmOnSuccess when the tag is finished.
-log('data=',data);
 data.gtmOnSuccess();
 
 
