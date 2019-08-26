@@ -115,8 +115,8 @@ ___TEMPLATE_PARAMETERS___
               "value": "section"
             },
             {
-              "value": "catalog",
-              "displayValue": "Catalog"
+              "displayValue": "Catalog",
+              "value": "catalog"
             }
           ],
           "displayName": "Filter Name",
@@ -232,44 +232,20 @@ ___WEB_PERMISSIONS___
   {
     "instance": {
       "key": {
-        "publicId": "send_pixel",
+        "publicId": "get_referrer",
         "versionId": "1"
       },
-      "param": [
-        {
-          "key": "urls",
-          "value": {
-            "type": 2,
-            "listItem": [
-              {
-                "type": 1,
-                "string": "https://api.empathybroker.com/tagging/v1/track/*"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
+      "param": []
     },
     "isRequired": true
   },
   {
     "instance": {
       "key": {
-        "publicId": "get_referrer",
+        "publicId": "send_pixel",
         "versionId": "1"
       },
-      "param": [
-        {
-          "key": "urlParts",
-          "value": {
-            "type": 1,
-            "string": "any"
-          }
-        }
-      ]
+      "param": []
     },
     "isRequired": true
   }
@@ -283,6 +259,7 @@ ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 const sendPixel = require('sendPixel');
 const getReferrer = require('getReferrerUrl');
 const query = require('queryPermission');
+const encodeUri = require('encodeUri');
 
 //Base request URL:
 let base_url = "https://api.empathybroker.com/tagging/v1/track/";
@@ -299,7 +276,7 @@ if(typeof(data.query) !== "undefined" && data.query !== ""){
 //2.Number of results (totalHits):
 if(typeof(data.totalHits) !== "undefined" && data.totalHits !== ""){
 	parameters[i] = 'totalHits=' + data.totalHits;
-  i++;
+    i++;
 }
 //3.SERP Number of results (totalHits):
 if(typeof(data.page) !== "undefined" && data.page !== ""){
@@ -355,11 +332,12 @@ if(typeof(data.IDsParameters) !== "undefined" && data.IDsParameters.length > 0){
 
 //Send request:
 //Request built
-let request_url = base_url + data.instanceID + "/query?" +parameters.join('&');
-let url = request_url;
+let request_url = base_url + data.instanceID + "/query";
+let path_input = '?' + parameters.join('&');
+let url = request_url + encodeUri(path_input);
 //Set request permissions:
 if (query('send_pixel', base_url)) {
-  sendPixel(url);
+  sendPixel(url,data.gtmOnSuccess, data.gtmOnFailure);
 }
 
 
