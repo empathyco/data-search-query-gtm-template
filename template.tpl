@@ -239,20 +239,51 @@ ___WEB_PERMISSIONS___
   {
     "instance": {
       "key": {
-        "publicId": "get_referrer",
+        "publicId": "send_pixel",
         "versionId": "1"
       },
-      "param": []
+      "param": [
+        {
+          "key": "urls",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "https://api.empathybroker.com/tagging/v1/track/*"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
     },
     "isRequired": true
   },
   {
     "instance": {
       "key": {
-        "publicId": "send_pixel",
+        "publicId": "get_referrer",
         "versionId": "1"
       },
-      "param": []
+      "param": [
+        {
+          "key": "urlParts",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        },
+        {
+          "key": "queriesAllowed",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        }
+      ]
     },
     "isRequired": true
   }
@@ -283,7 +314,7 @@ if(typeof(data.query) !== "undefined" && data.query !== ""){
 //2.Number of results (totalHits):
 if(typeof(data.totalHits) !== "undefined" && data.totalHits !== ""){
 	parameters[i] = 'totalHits=' + data.totalHits;
-    i++;
+  	i++;
 }
 //3.SERP Number of results (totalHits):
 if(typeof(data.page) !== "undefined" && data.page !== ""){
@@ -340,11 +371,12 @@ if(typeof(data.IDsParameters) !== "undefined" && data.IDsParameters.length > 0){
 //Send request:
 //Request built
 let request_url = base_url + data.instanceID + "/query";
+let url = request_url;
 let path_input = '?' + parameters.join('&');
-let url = request_url + encodeUri(path_input);
+let url_send = request_url + encodeUri(path_input);
 //Set request permissions:
 if (query('send_pixel', base_url)) {
-  sendPixel(url,data.gtmOnSuccess, data.gtmOnFailure);
+  sendPixel(url_send,data.gtmOnSuccess, data.gtmOnFailure);
 }
 
 
