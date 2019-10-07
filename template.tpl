@@ -258,7 +258,7 @@ ___WEB_PERMISSIONS___
       ]
     },
     "clientAnnotations": {
-      "isEditedByUser": true
+      "isEditedByUser": false
     },
     "isRequired": true
   },
