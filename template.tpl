@@ -292,8 +292,6 @@ ___WEB_PERMISSIONS___
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
-// Enter your template code here.
-// Requirements:
 const sendPixel = require('sendPixel');
 const getReferrer = require('getReferrerUrl');
 const query = require('queryPermission');
@@ -379,8 +377,6 @@ if (query('send_pixel', base_url)) {
 
 // Call data.gtmOnSuccess when the tag is finished.
 data.gtmOnSuccess();
-
-
 ___NOTES___
 
-Created on 26/06/2019, 15:44:07
+Updated on 14/07/2019, 15:44:07
