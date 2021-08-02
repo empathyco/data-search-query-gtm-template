@@ -291,9 +291,9 @@ function getBaseUrl (environment) {
   } else if (environment === 'saas-staging') {
     url = 'https://api-staging.empathybroker.com/tagging/v1/track/'
   } else if (environment === 'platform') {
-    url = 'CHANGEME platform prod url'
+    url = 'https://api.empathy.co/tagging/v1/track/'
   } else if (environment === 'platform-staging') {
-    url = 'CHANGEME platform staging url'
+    url = 'https://api.staging.empathy.co/tagging/v1/track/'
   }
   return url
 }
@@ -411,11 +411,11 @@ ___WEB_PERMISSIONS___
               },
               {
                 "type": 1,
-                "string": "CHANGEME platform prod url"
+                "string": "https://api.empathy.co/tagging/v1/track/*"
               },
               {
                 "type": 1,
-                "string": "CHANGEME platform staging url"
+                "string": "https://api.staging.empathy.co/tagging/v1/track/*"
               }
             ]
           }
@@ -477,14 +477,14 @@ scenarios:
     \ \n  environment: 'platform',\n  query: 'sample',\n  page: 1\n\
     \ };\n\n// Call runCode to run\
     \ the template's code.\nlet environment = runCode(mockData);\n\n// Verify that the tag finished\
-    \ successfully.\nassertApi('sendPixel').wasCalledWith('CHANGEME/empathy/query?q=sample&page=1',\
+    \ successfully.\nassertApi('sendPixel').wasCalledWith('https://api.empathy.co/tagging/v1/track/empathy/query?q=sample&page=1',\
     \ environment.onSuccess, environment.onFailure);"
 - name: Platform Staging
   code: "const mockData = {\n  instanceID: 'empathy',\
     \ \n  environment: 'platform-staging',\n  query: 'sample',\n  page: 1\n\
     \ };\n\n// Call runCode to run\
     \ the template's code.\nlet environment = runCode(mockData);\n\n// Verify that the tag finished\
-    \ successfully.\nassertApi('sendPixel').wasCalledWith('CHANGEME/empathy/query?q=sample&page=1',\
+    \ successfully.\nassertApi('sendPixel').wasCalledWith('https://api.staging.empathy.co/tagging/v1/track/empathy/query?q=sample&page=1',\
     \ environment.onSuccess, environment.onFailure);"
 
 
