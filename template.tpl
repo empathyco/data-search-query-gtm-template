@@ -238,6 +238,39 @@ ___TEMPLATE_PARAMETERS___
     "type": "PARAM_TABLE",
     "newRowButtonText": "Add ID",
     "newRowTitle": "Select the ID you want to include"
+  },
+  {
+    "type": "SELECT",
+    "name": "environment",
+    "displayName": "Environment",
+    "macrosInSelect": false,
+    "selectItems": [
+      {
+        "displayValue": "SaaS - production"
+        "value": "saas",
+      },
+      {
+        "displayValue": "SaaS - staging"
+        "value": "saas-staging",
+      },
+      {
+        "displayValue": "Platform - production"
+        "value": "platform",
+      },
+      {
+        "displayValue": "Platform - staging"
+        "value": "platform-staging",
+      }
+    ],
+    "valueValidators": [
+      {
+        "errorMessage": "Environment cannot be empty",
+        "type": "NON_EMPTY"
+      }
+    ]
+    "simpleValueType": true,
+    "defaultValue": "saas",
+    "help": "Environment where events are going to be sent (SaaS or Platform)"
   }
 ]
 
@@ -251,8 +284,22 @@ const getReferrer = require('getReferrerUrl');
 const query = require('queryPermission');
 const encodeUri = require('encodeUri');
 
+function getBaseUrl (environment) {
+  let url
+  if (environment === 'saas') {
+    url = 'https://api.empathybroker.com/tagging/v1/track/'
+  } else if (environment === 'saas-staging') {
+    url = 'https://api-staging.empathybroker.com/tagging/v1/track/'
+  } else if (environment === 'platform') {
+    url = 'https://api.empathy.co/tagging/v1/track/'
+  } else if (environment === 'platform-staging') {
+    url = 'https://api.staging.empathy.co/tagging/v1/track/'
+  }
+  return url
+}
+
 //Base request URL:
-let base_url = "https://api.empathybroker.com/tagging/v1/track/";
+const base_url = getBaseUrl(data.environment);
 
 //Get parameters:
 let parameters = [];
@@ -332,6 +379,12 @@ if (query('send_pixel', base_url)) {
 // Call data.gtmOnSuccess when the tag is finished.
 data.gtmOnSuccess();
 
+// Return container object with fields required for testing the template.
+return {
+  url: url_send,
+  onSuccess: data.gtmOnSuccess,
+  onFailure: data.getOnFailure
+};
 
 ___WEB_PERMISSIONS___
 
@@ -351,6 +404,18 @@ ___WEB_PERMISSIONS___
               {
                 "type": 1,
                 "string": "https://api.empathybroker.com/tagging/v1/track/*"
+              },
+              {
+                "type": 1,
+                "string": "https://api-staging.empathybroker.com/tagging/v1/track/*"
+              },
+              {
+                "type": 1,
+                "string": "https://api.empathy.co/tagging/v1/track/*"
+              },
+              {
+                "type": 1,
+                "string": "https://api.staging.empathy.co/tagging/v1/track/*"
               }
             ]
           }
@@ -392,7 +457,35 @@ ___WEB_PERMISSIONS___
 
 ___TESTS___
 
-scenarios: []
+scenarios:
+- name: Saas Prod
+  code: "const mockData = {\n  instanceID: 'empathy',\
+    \ \n  environment: 'saas',\n  query: 'sample',\n  page: 1\n\
+    \ };\n\n// Call runCode to run\
+    \ the template's code.\nlet environment = runCode(mockData);\n\n// Verify that the tag finished\
+    \ successfully.\nassertApi('sendPixel').wasCalledWith('https://api.empathybroker.com/tagging/v1/track/empathy/query?q=sample&page=1',\
+    \ environment.onSuccess, environment.onFailure);"
+- name: Saas Staging
+  code: "const mockData = {\n  instanceID: 'empathy',\
+    \ \n  environment: 'saas-staging',\n  query: 'sample',\n  page: 1\n\
+    \ };\n\n// Call runCode to run\
+    \ the template's code.\nlet environment = runCode(mockData);\n\n// Verify that the tag finished\
+    \ successfully.\nassertApi('sendPixel').wasCalledWith('https://api-staging.empathybroker.com/tagging/v1/track/empathy/query?q=sample&page=1',\
+    \ environment.onSuccess, environment.onFailure);"
+- name: Platform Prod
+  code: "const mockData = {\n  instanceID: 'empathy',\
+    \ \n  environment: 'platform',\n  query: 'sample',\n  page: 1\n\
+    \ };\n\n// Call runCode to run\
+    \ the template's code.\nlet environment = runCode(mockData);\n\n// Verify that the tag finished\
+    \ successfully.\nassertApi('sendPixel').wasCalledWith('https://api.empathy.co/tagging/v1/track/empathy/query?q=sample&page=1',\
+    \ environment.onSuccess, environment.onFailure);"
+- name: Platform Staging
+  code: "const mockData = {\n  instanceID: 'empathy',\
+    \ \n  environment: 'platform-staging',\n  query: 'sample',\n  page: 1\n\
+    \ };\n\n// Call runCode to run\
+    \ the template's code.\nlet environment = runCode(mockData);\n\n// Verify that the tag finished\
+    \ successfully.\nassertApi('sendPixel').wasCalledWith('https://api.staging.empathy.co/tagging/v1/track/empathy/query?q=sample&page=1',\
+    \ environment.onSuccess, environment.onFailure);"
 
 
 ___NOTES___
